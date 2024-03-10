@@ -96,8 +96,8 @@ public class UserController {
         return Result.success();
     }
 
-    @PostMapping("/updateTypes")
-    public Result updateTypes(@RequestBody List<User> userList) {
+    @PostMapping("/updateUserTypes")
+    public Result updateUserTypes(@RequestBody List<User> userList) {
         userService.updateBatchById(userList);
         return Result.success();
     }
@@ -109,7 +109,7 @@ public class UserController {
     }
 
     @GetMapping("/findOne/{uid}")
-    public Result findOne(@PathVariable Integer uid) {
+    public Result findOne(@PathVariable Long uid) {
         return Result.success(userService.getById(uid));
     }
 
