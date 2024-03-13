@@ -1,7 +1,7 @@
 package cn.wxl475.Mapper;
 
 
-import cn.wxl475.domain.User;
+import cn.wxl475.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.*;
 

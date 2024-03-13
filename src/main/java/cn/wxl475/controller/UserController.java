@@ -2,12 +2,10 @@ package cn.wxl475.controller;
 
 
 import cn.wxl475.Service.UserService;
-import cn.wxl475.domain.User;
 import cn.wxl475.pojo.Result;
+import cn.wxl475.pojo.User;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -44,11 +41,12 @@ public class UserController {
             //没有占用
             //注册
             user.setPassword("123456");
+            user.setDeleted(false);
             userService.save(user);
             return Result.success();
         } else {
             //占用
-            return Result.error("用户名已被占用");
+            return Result.error("该账号已存在");
         }
     }
 
@@ -73,8 +71,8 @@ public class UserController {
             String token = JwtUtils.generateJwt(claims, signKey, expire);
 
             //把token存储到redis中
-            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-            operations.set(token,token,1, TimeUnit.HOURS);
+//            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+//            operations.set(token,token,1, TimeUnit.HOURS);
 
             return Result.success(token);
         }
@@ -88,11 +86,11 @@ public class UserController {
     }
 
     @GetMapping("/updatePwd/{password}")
-    public Result updatePwd(@PathVariable String password, @RequestHeader("Authorization") String token) {
+    public Result updatePwd(@PathVariable String password) {
         userService.updatePwd(password);
         //删除redis中对应的token
-        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-        operations.getOperations().delete(token);
+//        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+//        operations.getOperations().delete(token);
         return Result.success();
     }
 
@@ -103,8 +101,8 @@ public class UserController {
     }
 
     @PostMapping("/deleteUsers")
-    public Result deleteUsers(@RequestBody List<Long> uids) {
-        userService.removeByIds(uids);
+    public Result deleteUsers(@RequestBody List<User> userList) {
+        userService.updateBatchById(userList);
         return Result.success();
     }
 
@@ -113,11 +111,10 @@ public class UserController {
         return Result.success(userService.getById(uid));
     }
 
-    @GetMapping("/findPage/{pageNum}/{pageSize}")
-    public Result findPage(@RequestParam Integer pageNum, @RequestParam Integer pageSize) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("uid");
-        return Result.success(userService.page(new Page<>(pageNum, pageSize), queryWrapper));
+    // 分页查询全部用户
+    @GetMapping("/findAllUserByPage/{pageNum}/{pageSize}")
+    public Result findAllUserByPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize) {
+        return Result.success(userService.findAllUserByPage(pageNum, pageSize));
     }
 
 }

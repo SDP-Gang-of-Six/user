@@ -2,16 +2,17 @@ package cn.wxl475.Service.impl;
 
 import cn.wxl475.Mapper.UserMapper;
 import cn.wxl475.Service.UserService;
-import cn.wxl475.domain.User;
+import cn.wxl475.mysql.ReadOnly;
+import cn.wxl475.pojo.User;
 import cn.wxl475.utils.Md5Util;
 import cn.wxl475.utils.ThreadLocalUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //    }
 
     @Override
+    @ReadOnly
     public User getByUsername(String username) {
         QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("username", username);
         return userMapper.selectOne(wrapper);
@@ -50,6 +52,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setPassword(Md5Util.getMD5String(password));
         userMapper.updateById(user);
     }
+
+    @Override
+    @ReadOnly
+    public List<User> findAllUserByPage(int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        List<User> lists = userMapper.selectList(null);
+        return lists;
+    }
+
 
 //    @Override
 //    public void deleteByUids(List<Long> uids) {

@@ -1,13 +1,14 @@
 package cn.wxl475.Service;
 
 
-import cn.wxl475.domain.User;
+
+import cn.wxl475.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
 public interface UserService extends IService<User>{
-    // 新增用户
+
 //    void addUser(User user);
 
     User getByUsername(String username);
@@ -15,6 +16,8 @@ public interface UserService extends IService<User>{
     void updateUser(User user);
 
     void updatePwd(String password);
+
+    List<User> findAllUserByPage(int pageNum, int pageSize);
 
 //    void deleteByUids(List<Long> uids);
 
