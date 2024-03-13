@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/user")
-@RequiredArgsConstructor
 @RestController
 public class UserController {
     @Autowired
@@ -28,10 +27,10 @@ public class UserController {
     private StringRedisTemplate stringRedisTemplate;
 
     @Value("${jwt.signKey}")
-    private final String signKey;
+    private String signKey;
 
     @Value("${jwt.expire}")
-    private final Long expire;
+    private Long expire;
 
     @PostMapping("/addUser")
     public Result addUser(@RequestBody User user) {
