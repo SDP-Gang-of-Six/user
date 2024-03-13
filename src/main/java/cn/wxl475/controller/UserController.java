@@ -19,9 +19,10 @@ import java.util.Map;
 
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@RestController
 public class UserController {
     @Autowired
-    private final UserService userService;
+    private UserService userService;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
