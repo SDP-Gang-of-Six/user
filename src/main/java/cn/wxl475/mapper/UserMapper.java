@@ -1,4 +1,4 @@
-package cn.wxl475.Mapper;
+package cn.wxl475.mapper;
 
 
 import cn.wxl475.pojo.User;

@@ -1,6 +1,6 @@
 package cn.wxl475.Service.impl;
 
-import cn.wxl475.Mapper.UserMapper;
+import cn.wxl475.mapper.UserMapper;
 import cn.wxl475.Service.UserService;
 import cn.wxl475.mysql.ReadOnly;
 import cn.wxl475.pojo.User;
