@@ -81,7 +81,7 @@ public class UserController {
 
             //把token存储到redis中
 //            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-//            operations.set(token,token,1, TimeUnit.HOURS);
+//            operations.set(token,token,1.yaml, TimeUnit.HOURS);
 
             return Result.success(token);
         }
@@ -124,7 +124,7 @@ public class UserController {
     @GetMapping("/userPage/{pageNum}/{pageSize}")
     public Result userPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize){
         try {
-            //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
+            //1.yaml.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
             PageHelper.startPage(pageNum, pageSize);
             //2.紧跟的查询就是一个分页查询-必须紧跟.后面的其他查询不会被分页
             List<User> userList = userService.getAllUsers();
