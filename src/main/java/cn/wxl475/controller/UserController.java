@@ -6,25 +6,25 @@ import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.User;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequestMapping("/user")
 @RestController
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+//    @Autowired
+//    private StringRedisTemplate stringRedisTemplate;
 
     @Value("${jwt.signKey}")
     private String signKey;
