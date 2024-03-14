@@ -6,6 +6,9 @@ import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.User;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,9 +43,9 @@ public class UserController {
         if (u == null) {
             //没有占用
             //注册
-            user.setPassword("123456");
+            user.setPassword(Md5Util.getMD5String("123456"));
             user.setDeleted(false);
-            userService.save(user);
+            userService.addUser(user);
             return Result.success();
         } else {
             //占用
@@ -79,11 +82,11 @@ public class UserController {
         return Result.error("密码错误");
     }
 
-    @PostMapping("/updateUser")
-    public Result updateUser(@RequestBody User user) {
-        userService.updateUser(user);
-        return Result.success();
-    }
+//    @PostMapping("/updateUser")
+//    public Result updateUser(@RequestBody User user) {
+//        userService.updateUser(user);
+//        return Result.success();
+//    }
 
     @GetMapping("/updatePwd/{password}")
     public Result updatePwd(@PathVariable String password) {
@@ -112,9 +115,22 @@ public class UserController {
     }
 
     // 分页查询全部用户
-    @GetMapping("/findAllUserByPage/{pageNum}/{pageSize}")
-    public Result findAllUserByPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize) {
-        return Result.success(userService.findAllUserByPage(pageNum, pageSize));
+    @GetMapping("/userPage/{pageNum}/{pageSize}")
+    public Result userPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize){
+        try {
+            //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
+            PageHelper.startPage(pageNum, pageSize);
+            //2.紧跟的查询就是一个分页查询-必须紧跟.后面的其他查询不会被分页
+            List<User> userList = userService.getAllUsers();
+            //3.使用PageInfo包装查询后的结果, pageSize是连续显示的条数
+            PageInfo pageInfo = new PageInfo(userList, pageSize);
+//            System.out.println(pageInfo);
+            return Result.success(pageInfo);
+        }finally {
+            //清理 ThreadLocal 存储的分页参数,保证线程安全
+            PageHelper.clearPage();
+        }
     }
+
 
 }

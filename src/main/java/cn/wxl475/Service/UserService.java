@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserService extends IService<User>{
 
-//    void addUser(User user);
+    void addUser(User user);
 
     User getByUsername(String username);
 
@@ -17,7 +17,9 @@ public interface UserService extends IService<User>{
 
     void updatePwd(String password);
 
-    List<User> findAllUserByPage(int pageNum, int pageSize);
+    List<User> getAllUsers();
+
+//    List<User> findAllUserByPage(int pageNum, int pageSize);
 
 //    void deleteByUids(List<Long> uids);
 

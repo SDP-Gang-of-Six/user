@@ -5,8 +5,9 @@ import cn.wxl475.Service.UserService;
 import cn.wxl475.pojo.User;
 import cn.wxl475.utils.Md5Util;
 import cn.wxl475.utils.ThreadLocalUtil;
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.PageHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,16 +23,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private UserMapper userMapper;
 
-//    @Override
-//    public void addUser(User user) {
-//        userMapper.insert(user);
-//    }
+    @Override
+    public void addUser(User user) {
+        userMapper.insert(user);
+    }
 
+    @DS("slave")
     @Override
     public User getByUsername(String username) {
-//        QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("username", username);
-//        return userMapper.selectOne(wrapper);
-        return userMapper.getByUsername(username);
+        QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("username", username);
+        return userMapper.selectOne(wrapper);
+//        return userMapper.getByUsername(username);
     }
 
     @Override
@@ -51,12 +53,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userMapper.updateById(user);
     }
 
+    @DS("slave")
     @Override
-    public List<User> findAllUserByPage(int pageNum, int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<User> lists = userMapper.selectList(null);
-        return lists;
+    public List<User> getAllUsers() {
+        return userMapper.selectList(null);
     }
+
+//    @Override
+//    public List<User> findAllUserByPage(int pageNum, int pageSize) {
+//        PageHelper.startPage(pageNum, pageSize);
+//        List<User> lists = userMapper.selectList(null);
+//        return lists;
+//    }
 
 
 //    @Override
