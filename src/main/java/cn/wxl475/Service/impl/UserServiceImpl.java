@@ -2,11 +2,9 @@ package cn.wxl475.Service.impl;
 
 import cn.wxl475.mapper.UserMapper;
 import cn.wxl475.Service.UserService;
-import cn.wxl475.mysql.ReadOnly;
 import cn.wxl475.pojo.User;
 import cn.wxl475.utils.Md5Util;
 import cn.wxl475.utils.ThreadLocalUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //    }
 
     @Override
-    @ReadOnly
     public User getByUsername(String username) {
 //        QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("username", username);
 //        return userMapper.selectOne(wrapper);
@@ -55,7 +52,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    @ReadOnly
     public List<User> findAllUserByPage(int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         List<User> lists = userMapper.selectList(null);
