@@ -59,18 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.selectList(null);
     }
 
-//    @Override
-//    public List<User> findAllUserByPage(int pageNum, int pageSize) {
-//        PageHelper.startPage(pageNum, pageSize);
-//        List<User> lists = userMapper.selectList(null);
-//        return lists;
-//    }
 
-
-//    @Override
-//    public void deleteByUids(List<Long> uids) {
-//        userMapper.deleteBatchIds(uids);
-//    }
 
 //    @Override
 //    public void updateTypes(List<User> userList) {

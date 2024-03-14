@@ -4,6 +4,7 @@ package cn.wxl475.controller;
 import cn.wxl475.Service.UserService;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.User;
+import cn.wxl475.redis.CacheClient;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
 import com.github.pagehelper.Page;
@@ -15,9 +16,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequestMapping("/user")
@@ -26,8 +29,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @Autowired
-//    private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private CacheClient cacheClient;
 
     @Value("${jwt.signKey}")
     private String signKey;
