@@ -2,7 +2,9 @@ package cn.wxl475.Service.impl;
 
 import cn.wxl475.mapper.UserMapper;
 import cn.wxl475.Service.UserService;
+import cn.wxl475.pojo.Question;
 import cn.wxl475.pojo.User;
+import cn.wxl475.redis.CacheClient;
 import cn.wxl475.utils.Md5Util;
 import cn.wxl475.utils.ThreadLocalUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
@@ -10,10 +12,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static cn.wxl475.redis.RedisConstants.*;
+import static cn.wxl475.redis.RedisConstants.CACHE_QUESTION_TTL;
 
 
 @Service
@@ -22,6 +30,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private CacheClient cacheClient;
 
     @Override
     public void addUser(User user) {
@@ -42,6 +56,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Long uid = (Long) map.get("uid");
         user.setUid(uid);
         userMapper.updateById(user);
+//        // 将该用户的全部信息保存至redis缓存
+//        User user1 = userMapper.selectById(uid);
+//        cacheClient.setWithLogicalExpire(CACHE_USERS_KEY + user1.getUid().toString(),
+//                user1, CACHE_USERS_TTL, TimeUnit.MINUTES);
+        stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
     }
 
     @Override
@@ -51,6 +70,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = userMapper.selectById(uid);
         user.setPassword(Md5Util.getMD5String(password));
         userMapper.updateById(user);
+//        cacheClient.setWithLogicalExpire(CACHE_USERS_KEY + user.getUid().toString(),
+//                user, CACHE_USERS_TTL, TimeUnit.MINUTES);
+        stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
     }
 
     @DS("slave")
@@ -59,6 +81,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.selectList(null);
     }
 
+    @DS("slave")
+    @Override
+    public User getUserById(Long uid) {
+        return cacheClient.queryWithPassThrough(
+                CACHE_USERS_KEY,
+                uid,
+                User.class,
+                id ->  userMapper.selectById(uid),
+                CACHE_USERS_TTL,
+                TimeUnit.MINUTES
+        );
+    }
 
 
 //    @Override

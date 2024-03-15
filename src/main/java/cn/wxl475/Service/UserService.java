@@ -19,6 +19,8 @@ public interface UserService extends IService<User>{
 
     List<User> getAllUsers();
 
+    User getUserById(Long uid);
+
 //    List<User> findAllUserByPage(int pageNum, int pageSize);
 
 //    void deleteByUids(List<Long> uids);

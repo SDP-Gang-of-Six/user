@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static cn.wxl475.redis.RedisConstants.CACHE_USERS_KEY;
+
 @Slf4j
 @RequestMapping("/user")
 @RestController
@@ -32,8 +34,9 @@ public class UserController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @Resource
+    @Autowired
     private CacheClient cacheClient;
+
 
     @Value("${jwt.signKey}")
     private String signKey;
@@ -106,18 +109,30 @@ public class UserController {
     @PostMapping("/updateUserTypes")
     public Result updateUserTypes(@RequestBody List<User> userList) {
         userService.updateBatchById(userList);
+        for(User user: userList) {
+            Long uid = user.getUid();
+            stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
+        }
         return Result.success();
     }
 
     @PostMapping("/deleteUsers")
     public Result deleteUsers(@RequestBody List<User> userList) {
         userService.updateBatchById(userList);
+        for(User user: userList) {
+            Long uid = user.getUid();
+            stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
+        }
         return Result.success();
     }
 
-    @GetMapping("/findOne/{uid}")
-    public Result findOne(@PathVariable Long uid) {
-        return Result.success(userService.getById(uid));
+    @GetMapping("/getUserById/{uid}")
+    public Result getUserById(@PathVariable Long uid) {
+        User user = userService.getUserById(uid);
+        if(user == null) {
+            return Result.error("用户不存在");
+        }
+        return Result.success(user);
     }
 
     // 分页查询全部用户
@@ -130,7 +145,6 @@ public class UserController {
             List<User> userList = userService.getAllUsers();
             //3.使用PageInfo包装查询后的结果, pageSize是连续显示的条数
             PageInfo pageInfo = new PageInfo(userList, pageSize);
-//            System.out.println(pageInfo);
             return Result.success(pageInfo);
         }finally {
             //清理 ThreadLocal 存储的分页参数,保证线程安全
