@@ -50,6 +50,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //        return userMapper.getByUsername(username);
     }
 
+    @DS("slave")
+    @Override
+    public List<User> getByNickname(String nickname) {
+        QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("nickname", nickname);
+        return userMapper.selectList(wrapper);
+    }
+
     @Override
     public void updateUser(User user) {
         Map<String, Object> map = ThreadLocalUtil.get();

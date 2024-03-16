@@ -13,6 +13,8 @@ public interface UserService extends IService<User>{
 
     User getByUsername(String username);
 
+    List<User> getByNickname(String nickname);
+
     void updateUser(User user);
 
     void updatePwd(String password);

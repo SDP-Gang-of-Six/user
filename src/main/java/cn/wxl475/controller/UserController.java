@@ -135,6 +135,24 @@ public class UserController {
         return Result.success(user);
     }
 
+    @GetMapping("getByNickname/{nickname}")
+    public Result getByNickname(@PathVariable String nickname) {
+        List<User> users = userService.getByNickname(nickname);
+        if(users == null || users.size() == 0) {
+            return Result.error("用户不存在");
+        }
+        return Result.success(users);
+    }
+
+    @GetMapping("getByUsername/{username}")
+    public Result getByUsername(@PathVariable String username) {
+        User user = userService.getByUsername(username);
+        if(user == null) {
+            return Result.error("用户不存在");
+        }
+        return Result.success(user);
+    }
+
     // 分页查询全部用户
     @GetMapping("/userPage/{pageNum}/{pageSize}")
     public Result userPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize){

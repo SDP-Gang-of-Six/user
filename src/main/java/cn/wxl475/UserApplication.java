@@ -9,7 +9,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @MapperScan("cn.wxl475.mapper")
-@EnableFeignClients(clients = DataClient.class, defaultConfiguration = DefaultFeignConfiguration.class)
 public class UserApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserApplication.class,args);
