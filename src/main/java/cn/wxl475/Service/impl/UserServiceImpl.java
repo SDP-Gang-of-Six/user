@@ -93,6 +93,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getUserById(Long uid) {
         return cacheClient.queryWithPassThrough(
                 CACHE_USERS_KEY,
+                LOCK_USERS_KEY,
                 uid,
                 User.class,
                 id ->  userMapper.selectById(uid),
