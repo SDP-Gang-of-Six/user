@@ -5,7 +5,7 @@ on:
     tags: [ 'v*.*.*' ]
 
 env:
-  # Dockerhub账户
+  # dockerhub账户
   DOCKERHUB_REGISTRY: docker.io
   DOCKERHUB_USERNAME: 1715142548
   DOCKERHUB_PASSWORD: wxl5211314
