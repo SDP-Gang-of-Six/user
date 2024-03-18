@@ -130,13 +130,15 @@ jobs:
         images: ${{ env.DOCKERHUB_NAMESPACE }}/${{ env.DOCKERHUB_REPOSITORY }}
 
     - name: Build and push Docker images
-      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
       with:
         context: ${{ env.TARGET_MODULE }}
         file: ${{ env.TARGET_MODULE }}/Dockerfile
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Run command via SSH
       run: sshpass -p "${{ env.ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@wxl475.cn "sh /root/pet-hospital/${{ env.TARGET_MODULE }}.sh"
