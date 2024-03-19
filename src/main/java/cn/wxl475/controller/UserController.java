@@ -7,9 +7,11 @@ import cn.wxl475.pojo.User;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
+import cn.wxl475.utils.ThreadLocalUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,11 +100,17 @@ public class UserController {
 //    }
 
     @GetMapping("/updatePwd/{password}")
-    public Result updatePwd(@PathVariable String password) {
-        userService.updatePwd(password);
-        //删除redis中对应的token
-//        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-//        operations.getOperations().delete(token);
+    public Result updatePwd(@RequestHeader("Authorization") String token , @PathVariable String password) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+
+        // 需要先转为String类型，再转为Long类型
+        String uidStr = String.valueOf(claims.get("uid"));
+        Long uid = Long.parseLong(uidStr);
+
+        User loginUser = userService.getUserById(uid);
+        loginUser.setPassword(Md5Util.getMD5String(password));
+        userService.updateById(loginUser);
+        stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
         return Result.success();
     }
 
@@ -118,7 +126,7 @@ public class UserController {
 
     @PostMapping("/deleteUsers")
     public Result deleteUsers(@RequestBody List<Long> ids) {
-        userService.removeBatchByIds(ids);
+        userService.removeByIds(ids);
         for(Long id: ids) {
             stringRedisTemplate.delete(CACHE_USERS_KEY + id);
         }

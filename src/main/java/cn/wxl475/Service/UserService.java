@@ -17,15 +17,8 @@ public interface UserService extends IService<User>{
 
     void updateUser(User user);
 
-    void updatePwd(String password);
-
     List<User> getAllUsers();
 
     User getUserById(Long uid);
 
-//    List<User> findAllUserByPage(int pageNum, int pageSize);
-
-//    void deleteByUids(List<Long> uids);
-
-//    void updateTypes(List<User> userList);
 }

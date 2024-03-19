@@ -63,24 +63,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Long uid = (Long) map.get("uid");
         user.setUid(uid);
         userMapper.updateById(user);
-//        // 将该用户的全部信息保存至redis缓存
-//        User user1 = userMapper.selectById(uid);
-//        cacheClient.setWithLogicalExpire(CACHE_USERS_KEY + user1.getUid().toString(),
-//                user1, CACHE_USERS_TTL, TimeUnit.MINUTES);
         stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
     }
 
-    @Override
-    public void updatePwd(String password) {
-        Map<String, Object> map = ThreadLocalUtil.get();
-        Long uid = (Long) map.get("uid");
-        User user = userMapper.selectById(uid);
-        user.setPassword(Md5Util.getMD5String(password));
-        userMapper.updateById(user);
-//        cacheClient.setWithLogicalExpire(CACHE_USERS_KEY + user.getUid().toString(),
-//                user, CACHE_USERS_TTL, TimeUnit.MINUTES);
-        stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
-    }
 
     @DS("slave")
     @Override
@@ -102,11 +87,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         );
     }
 
-
-//    @Override
-//    public void updateTypes(List<User> userList) {
-//        for(User user: userList) {
-//            userMapper.updateById(user);
-//        }
-//    }
 }
