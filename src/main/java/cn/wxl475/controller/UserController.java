@@ -117,11 +117,10 @@ public class UserController {
     }
 
     @PostMapping("/deleteUsers")
-    public Result deleteUsers(@RequestBody List<User> userList) {
-        userService.updateBatchById(userList);
-        for(User user: userList) {
-            Long uid = user.getUid();
-            stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
+    public Result deleteUsers(@RequestBody List<Long> ids) {
+        userService.removeBatchByIds(ids);
+        for(Long id: ids) {
+            stringRedisTemplate.delete(CACHE_USERS_KEY + id);
         }
         return Result.success();
     }
