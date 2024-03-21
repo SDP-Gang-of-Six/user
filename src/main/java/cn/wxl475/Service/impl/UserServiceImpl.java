@@ -70,7 +70,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @DS("slave")
     @Override
     public List<User> getAllUsers() {
-        return userMapper.selectList(null);
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("user_type");
+        return userMapper.selectList(wrapper);
     }
 
     @DS("slave")
