@@ -16,12 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static cn.wxl475.redis.RedisConstants.CACHE_USERS_KEY;
@@ -39,6 +41,10 @@ public class UserController {
     @Autowired
     private CacheClient cacheClient;
 
+    //用户登录次数计数redisKey前缀
+    private String LOGIN_COUNT = "login-count:";
+    //用户登录是否被锁定一小时redisKey前缀
+    private String IS_LOCK = "is-lock:";
 
     @Value("${jwt.signKey}")
     private String signKey;
@@ -66,31 +72,49 @@ public class UserController {
 
     @PostMapping("/login")
     public Result login(@RequestBody User user) {
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
         String username = user.getUsername();
         String password = user.getPassword();
+        if("LOCK".equals(operations.get(IS_LOCK + username))) {
+            return Result.error("错误次数过多，请稍后再尝试");
+        }
         //根据用户名查询用户
         User loginUser = userService.getByUsername(username);
         //判断该用户是否存在
         if (loginUser == null) {
+            operations.increment(LOGIN_COUNT + username, 1);
+            if (Integer.parseInt(operations.get(LOGIN_COUNT + username)) >= 5) {
+                operations.set(IS_LOCK + username, "LOCK", 1, TimeUnit.MINUTES);
+                stringRedisTemplate.expire(LOGIN_COUNT + username, 1, TimeUnit.MINUTES);
+                return Result.error("错误次数过多，请稍后再尝试");
+            }
             return Result.error("用户名错误");
         }
 
         //判断密码是否正确  loginUser对象中的password是密文
-        if (Md5Util.getMD5String(password).equals(loginUser.getPassword())) {
-            //登录成功
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("uid", loginUser.getUid());
-            claims.put("username", loginUser.getUsername());
-            claims.put("userType", loginUser.getUserType());
-            String token = JwtUtils.generateJwt(claims, signKey, expire);
+        if (!Md5Util.getMD5String(password).equals(loginUser.getPassword())) {
+            operations.increment(LOGIN_COUNT + username, 1);
+            if (Integer.parseInt(operations.get(LOGIN_COUNT + username)) >= 5) {
+                operations.set(IS_LOCK + username, "LOCK", 1, TimeUnit.MINUTES);
+                stringRedisTemplate.expire(LOGIN_COUNT + username, 1, TimeUnit.MINUTES);
+                return Result.error("错误次数过多，请稍后再尝试");
+            }
+            return Result.error("密码错误");
+        }
 
-            //把token存储到redis中
+        //登录成功
+        operations.set(LOGIN_COUNT + username, "0");
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uid", loginUser.getUid());
+        claims.put("username", loginUser.getUsername());
+        claims.put("userType", loginUser.getUserType());
+        String token = JwtUtils.generateJwt(claims, signKey, expire);
+
+        //把token存储到redis中
 //            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
 //            operations.set(token,token,1, TimeUnit.HOURS);
 
-            return Result.success(token);
-        }
-        return Result.error("密码错误");
+        return Result.success(token);
     }
 
 //    @PostMapping("/updateUser")
@@ -145,7 +169,7 @@ public class UserController {
     @GetMapping("getByNickname/{nickname}")
     public Result getByNickname(@PathVariable String nickname) {
         List<User> users = userService.getByNickname(nickname);
-        if(users == null || users.size() == 0) {
+        if(users == null || users.isEmpty()) {
             return Result.error("用户不存在");
         }
         return Result.success(users);
