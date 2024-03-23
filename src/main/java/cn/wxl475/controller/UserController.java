@@ -7,6 +7,7 @@ import cn.wxl475.pojo.User;
 import cn.wxl475.redis.CacheClient;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
+import cn.wxl475.utils.PasswordValidator;
 import cn.wxl475.utils.ThreadLocalUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -38,9 +39,6 @@ public class UserController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    private CacheClient cacheClient;
-
     //用户登录次数计数redisKey前缀
     private String LOGIN_COUNT = "login-count:";
     //用户登录是否被锁定一小时redisKey前缀
@@ -60,7 +58,7 @@ public class UserController {
         if (u == null) {
             //没有占用
             //注册
-            user.setPassword(Md5Util.getMD5String("123456"));
+            user.setPassword(Md5Util.getMD5String("pet123456"));
             user.setDeleted(false);
             userService.addUser(user);
             return Result.success();
@@ -111,17 +109,19 @@ public class UserController {
         return Result.success(token);
     }
 
-//    @PostMapping("/updateUser")
-//    public Result updateUser(@RequestBody User user) {
-//        userService.updateUser(user);
-//        return Result.success();
-//    }
 
     @GetMapping("/updatePwd/{password}")
     public Result updatePwd(@RequestHeader("Authorization") String token , @PathVariable String password) {
-        if(password.length() < 5 || password.length() > 16) {
-            return Result.error("请输入长度为5-16的新密码");
+//        if(password == null) {
+//            return Result.error("密码不能为空");
+//        }
+//        if(password.length() < 5 || password.length() > 16) {
+//            return Result.error("请输入长度为5-16的新密码");
+//        }
+        if(!PasswordValidator.isCharacterAndNumber(password)) {
+            return Result.error("请输入长度为8-16的同时包含数字和字母的密码");
         }
+
         Claims claims = JwtUtils.parseJWT(token, signKey);
 
         // 需要先转为String类型，再转为Long类型
