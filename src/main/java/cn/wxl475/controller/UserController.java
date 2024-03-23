@@ -76,19 +76,13 @@ public class UserController {
         String username = user.getUsername();
         String password = user.getPassword();
         if("LOCK".equals(operations.get(IS_LOCK + username))) {
-            return Result.error("错误次数过多，请稍后再尝试");
+            return Result.error("密码错误次数过多，请稍后再尝试");
         }
         //根据用户名查询用户
         User loginUser = userService.getByUsername(username);
         //判断该用户是否存在
         if (loginUser == null) {
-            operations.increment(LOGIN_COUNT + username, 1);
-            if (Integer.parseInt(operations.get(LOGIN_COUNT + username)) >= 5) {
-                operations.set(IS_LOCK + username, "LOCK", 1, TimeUnit.MINUTES);
-                stringRedisTemplate.expire(LOGIN_COUNT + username, 1, TimeUnit.MINUTES);
-                return Result.error("错误次数过多，请稍后再尝试");
-            }
-            return Result.error("用户名错误");
+            return Result.error("该用户不存在");
         }
 
         //判断密码是否正确  loginUser对象中的password是密文
@@ -97,7 +91,7 @@ public class UserController {
             if (Integer.parseInt(operations.get(LOGIN_COUNT + username)) >= 5) {
                 operations.set(IS_LOCK + username, "LOCK", 1, TimeUnit.MINUTES);
                 stringRedisTemplate.expire(LOGIN_COUNT + username, 1, TimeUnit.MINUTES);
-                return Result.error("错误次数过多，请稍后再尝试");
+                return Result.error("密码错误次数过多，请稍后再尝试");
             }
             return Result.error("密码错误");
         }
