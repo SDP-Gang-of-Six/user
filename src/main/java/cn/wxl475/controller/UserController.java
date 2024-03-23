@@ -119,6 +119,9 @@ public class UserController {
 
     @GetMapping("/updatePwd/{password}")
     public Result updatePwd(@RequestHeader("Authorization") String token , @PathVariable String password) {
+        if(password.length() < 5 || password.length() > 16) {
+            return Result.error("请输入长度为5-16的新密码");
+        }
         Claims claims = JwtUtils.parseJWT(token, signKey);
 
         // 需要先转为String类型，再转为Long类型
