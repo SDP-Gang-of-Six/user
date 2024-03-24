@@ -40,9 +40,9 @@ public class UserController {
     private StringRedisTemplate stringRedisTemplate;
 
     //用户登录次数计数redisKey前缀
-    private String LOGIN_COUNT = "login-count:";
+    private final String LOGIN_COUNT = "login-count:";
     //用户登录是否被锁定一小时redisKey前缀
-    private String IS_LOCK = "is-lock:";
+    private final String IS_LOCK = "is-lock:";
 
     @Value("${jwt.signKey}")
     private String signKey;
