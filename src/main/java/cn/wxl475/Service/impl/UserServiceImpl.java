@@ -61,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<User> getAllUsers() {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("user_type");
+        wrapper.orderByDesc(true, "user_type");
         return userMapper.selectList(wrapper);
     }
 
