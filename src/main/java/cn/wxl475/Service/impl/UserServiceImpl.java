@@ -57,21 +57,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.selectList(wrapper);
     }
 
-    @Override
-    public void updateUser(User user) {
-        Map<String, Object> map = ThreadLocalUtil.get();
-        Long uid = (Long) map.get("uid");
-        user.setUid(uid);
-        userMapper.updateById(user);
-        stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
-    }
-
-
     @DS("slave")
     @Override
     public List<User> getAllUsers() {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("user_type");
+        wrapper.orderByDesc(true, "user_type");
         return userMapper.selectList(wrapper);
     }
 

@@ -15,8 +15,6 @@ public interface UserService extends IService<User>{
 
     List<User> getByNickname(String nickname);
 
-    void updateUser(User user);
-
     List<User> getAllUsers();
 
     User getUserById(Long uid);
