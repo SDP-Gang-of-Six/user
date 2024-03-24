@@ -112,12 +112,6 @@ public class UserController {
 
     @GetMapping("/updatePwd/{password}")
     public Result updatePwd(@RequestHeader("Authorization") String token , @PathVariable String password) {
-//        if(password == null) {
-//            return Result.error("密码不能为空");
-//        }
-//        if(password.length() < 5 || password.length() > 16) {
-//            return Result.error("请输入长度为5-16的新密码");
-//        }
         if(!PasswordValidator.isCharacterAndNumber(password)) {
             return Result.error("请输入长度为8-16的同时包含数字和字母的密码");
         }
