@@ -53,8 +53,8 @@ public class UserController {
     @PostMapping("/addUser")
     public Result addUser(@RequestHeader("Authorization") String token, @RequestBody User user) {
         Claims claims = JwtUtils.parseJWT(token, signKey);
-        Integer userType = (Integer) claims.get("userType");
-        if(userType == 0) {
+        Boolean userType = (Boolean) claims.get("userType");
+        if(!userType) {
             return Result.error("无增加用户权限");
         }
         String username = user.getUsername();
@@ -137,8 +137,8 @@ public class UserController {
     @PostMapping("/updateUserTypes")
     public Result updateUserTypes(@RequestHeader("Authorization") String token, @RequestBody List<User> userList) {
         Claims claims = JwtUtils.parseJWT(token, signKey);
-        Integer userType = (Integer) claims.get("userType");
-        if(userType == 0) {
+        Boolean userType = (Boolean) claims.get("userType");
+        if(!userType) {
             return Result.error("无修改用户类型权限");
         }
         userService.updateBatchById(userList);
@@ -152,8 +152,8 @@ public class UserController {
     @PostMapping("/deleteUsers")
     public Result deleteUsers(@RequestHeader("Authorization") String token, @RequestBody List<Long> ids) {
         Claims claims = JwtUtils.parseJWT(token, signKey);
-        Integer userType = (Integer) claims.get("userType");
-        if(userType == 0) {
+        Boolean userType = (Boolean) claims.get("userType");
+        if(!userType) {
             return Result.error("无删除用户权限");
         }
         userService.removeByIds(ids);
