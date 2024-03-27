@@ -51,7 +51,12 @@ public class UserController {
     private Long expire;
 
     @PostMapping("/addUser")
-    public Result addUser(@RequestBody User user) {
+    public Result addUser(@RequestHeader("Authorization") String token, @RequestBody User user) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+        Integer userType = (Integer) claims.get("userType");
+        if(userType == 0) {
+            return Result.error("无增加用户权限");
+        }
         String username = user.getUsername();
         //查询用户
         User u = userService.getByUsername(username);
@@ -130,7 +135,12 @@ public class UserController {
     }
 
     @PostMapping("/updateUserTypes")
-    public Result updateUserTypes(@RequestBody List<User> userList) {
+    public Result updateUserTypes(@RequestHeader("Authorization") String token, @RequestBody List<User> userList) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+        Integer userType = (Integer) claims.get("userType");
+        if(userType == 0) {
+            return Result.error("无修改用户类型权限");
+        }
         userService.updateBatchById(userList);
         for(User user: userList) {
             Long uid = user.getUid();
@@ -140,7 +150,12 @@ public class UserController {
     }
 
     @PostMapping("/deleteUsers")
-    public Result deleteUsers(@RequestBody List<Long> ids) {
+    public Result deleteUsers(@RequestHeader("Authorization") String token, @RequestBody List<Long> ids) {
+        Claims claims = JwtUtils.parseJWT(token, signKey);
+        Integer userType = (Integer) claims.get("userType");
+        if(userType == 0) {
+            return Result.error("无删除用户权限");
+        }
         userService.removeByIds(ids);
         for(Long id: ids) {
             stringRedisTemplate.delete(CACHE_USERS_KEY + id);
@@ -149,7 +164,7 @@ public class UserController {
     }
 
     @GetMapping("/getUserById/{uid}")
-    public Result getUserById(@PathVariable Long uid) {
+    public Result getUserById(@RequestHeader("Authorization") String token, @PathVariable Long uid) {
         User user = userService.getUserById(uid);
         if(user == null) {
             return Result.error("用户不存在");
@@ -158,7 +173,7 @@ public class UserController {
     }
 
     @GetMapping("getByNickname/{nickname}")
-    public Result getByNickname(@PathVariable String nickname) {
+    public Result getByNickname(@RequestHeader("Authorization") String token, @PathVariable String nickname) {
         List<User> users = userService.getByNickname(nickname);
         if(users == null || users.isEmpty()) {
             return Result.error("用户不存在");
@@ -167,7 +182,7 @@ public class UserController {
     }
 
     @GetMapping("getByUsername/{username}")
-    public Result getByUsername(@PathVariable String username) {
+    public Result getByUsername(@RequestHeader("Authorization") String token, @PathVariable String username) {
         User user = userService.getByUsername(username);
         if(user == null) {
             return Result.error("用户不存在");
@@ -177,7 +192,7 @@ public class UserController {
 
     // 分页查询全部用户
     @GetMapping("/userPage/{pageNum}/{pageSize}")
-    public Result userPage(@PathVariable Integer pageNum, @PathVariable Integer pageSize){
+    public Result userPage(@RequestHeader("Authorization") String token, @PathVariable Integer pageNum, @PathVariable Integer pageSize){
         try {
             //1.引入分页插件,pageNum是第几页，pageSize是每页显示多少条,默认查询总数count
             PageHelper.startPage(pageNum, pageSize);

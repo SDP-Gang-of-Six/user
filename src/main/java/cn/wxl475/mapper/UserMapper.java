@@ -8,7 +8,5 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-//    @Select("select * from user.user where username = #{username}")
-//    User getByUsername(String username);
 }
 
