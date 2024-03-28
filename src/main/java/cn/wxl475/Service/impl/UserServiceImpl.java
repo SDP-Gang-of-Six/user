@@ -2,11 +2,8 @@ package cn.wxl475.Service.impl;
 
 import cn.wxl475.mapper.UserMapper;
 import cn.wxl475.Service.UserService;
-import cn.wxl475.pojo.Question;
 import cn.wxl475.pojo.User;
 import cn.wxl475.redis.CacheClient;
-import cn.wxl475.utils.Md5Util;
-import cn.wxl475.utils.ThreadLocalUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,13 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static cn.wxl475.redis.RedisConstants.*;
-import static cn.wxl475.redis.RedisConstants.CACHE_QUESTION_TTL;
 
 
 @Service
