@@ -39,8 +39,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @DS("slave")
     @Override
     public User getByUsername(String username) {
-//        QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("username", username);
-//        return userMapper.selectOne(wrapper);
         return cacheClient.queryWithPassThrough(
                 CACHE_USERS_KEY,
                 LOCK_USERS_KEY,

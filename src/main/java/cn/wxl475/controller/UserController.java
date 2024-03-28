@@ -106,11 +106,6 @@ public class UserController {
         claims.put("username", loginUser.getUsername());
         claims.put("userType", loginUser.getUserType());
         String token = JwtUtils.generateJwt(claims, signKey, expire);
-
-        //把token存储到redis中
-//            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-//            operations.set(token,token,1, TimeUnit.HOURS);
-
         return Result.success(token);
     }
 
