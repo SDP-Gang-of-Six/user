@@ -4,12 +4,9 @@ package cn.wxl475.controller;
 import cn.wxl475.Service.UserService;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.User;
-import cn.wxl475.redis.CacheClient;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
 import cn.wxl475.utils.PasswordValidator;
-import cn.wxl475.utils.ThreadLocalUtil;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.jsonwebtoken.Claims;
@@ -20,11 +17,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static cn.wxl475.redis.RedisConstants.CACHE_USERS_KEY;
