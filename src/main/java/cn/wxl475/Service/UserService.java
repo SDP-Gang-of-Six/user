@@ -2,6 +2,7 @@ package cn.wxl475.Service;
 
 
 
+import cn.wxl475.pojo.Page;
 import cn.wxl475.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,10 +14,9 @@ public interface UserService extends IService<User>{
 
     User getByUsername(String username);
 
-    List<User> getByNickname(String nickname);
-
     List<User> getAllUsers();
 
     User getUserById(Long uid);
 
+    Page<User> getByNickname(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
 }

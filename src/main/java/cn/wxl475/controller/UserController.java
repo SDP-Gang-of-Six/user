@@ -4,6 +4,7 @@ package cn.wxl475.controller;
 import cn.wxl475.Service.UserService;
 import cn.wxl475.pojo.Result;
 import cn.wxl475.pojo.User;
+import cn.wxl475.repo.UserEsRepo;
 import cn.wxl475.utils.JwtUtils;
 import cn.wxl475.utils.Md5Util;
 import cn.wxl475.utils.PasswordValidator;
@@ -17,6 +18,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,9 @@ public class UserController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private UserEsRepo userEsRepo;
 
     //用户登录次数计数redisKey前缀
     private final String LOGIN_COUNT = "login-count:";
@@ -59,8 +64,10 @@ public class UserController {
             //没有占用
             //注册
             user.setPassword(Md5Util.getMD5String("pet123456"));
-            user.setDeleted(false);
+            user.setUserType(false);
             userService.addUser(user);
+            System.out.println(user);
+            userEsRepo.save(user);
             return Result.success();
         } else {
             //占用
@@ -120,6 +127,7 @@ public class UserController {
         User loginUser = userService.getUserById(uid);
         loginUser.setPassword(Md5Util.getMD5String(password));
         userService.updateById(loginUser);
+        userEsRepo.save(loginUser);
         stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
         return Result.success();
     }
@@ -132,6 +140,14 @@ public class UserController {
             return Result.error("无修改用户类型权限");
         }
         userService.updateBatchById(userList);
+        List<User> users = new ArrayList<>();
+        for(User user: userList) {
+            Long uid = user.getUid();
+            User newUser = userService.getUserById(uid);
+            users.add(newUser);
+        }
+        System.out.println(users);
+        userEsRepo.saveAll(users);
         for(User user: userList) {
             Long uid = user.getUid();
             stringRedisTemplate.delete(CACHE_USERS_KEY + uid);
@@ -147,6 +163,7 @@ public class UserController {
             return Result.error("无删除用户权限");
         }
         userService.removeByIds(ids);
+        userEsRepo.deleteAllById(ids);
         for(Long id: ids) {
             stringRedisTemplate.delete(CACHE_USERS_KEY + id);
         }
@@ -162,13 +179,17 @@ public class UserController {
         return Result.success(user);
     }
 
-    @GetMapping("getByNickname/{nickname}")
-    public Result getByNickname(@RequestHeader("Authorization") String token, @PathVariable String nickname) {
-        List<User> users = userService.getByNickname(nickname);
-        if(users == null || users.isEmpty()) {
-            return Result.error("用户不存在");
+    @PostMapping("/getByNickname")
+    public Result getByNickname(@RequestHeader("Authorization") String token,
+                                         @RequestParam String keyword,
+                                         @RequestParam Integer pageNum,
+                                         @RequestParam Integer pageSize,
+                                         @RequestParam(required = false) String sortField,
+                                         @RequestParam(required = false) Integer sortOrder){
+        if(pageNum <= 0 || pageSize <= 0){
+            return Result.error("页码或页大小不合法");
         }
-        return Result.success(users);
+        return Result.success(userService.getByNickname(keyword,pageNum,pageSize,sortField,sortOrder));
     }
 
     @GetMapping("getByUsername/{username}")
