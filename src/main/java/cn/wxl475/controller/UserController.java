@@ -198,7 +198,9 @@ public class UserController {
         if(user == null) {
             return Result.error("用户不存在");
         }
-        return Result.success(user);
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        return Result.success(userList);
     }
 
     // 分页查询全部用户
