@@ -106,4 +106,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return users;
     }
 
+    @DS("slave")
+    @Override
+    public String getNicknameById(Long uid) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("nickname").eq("uid", uid);
+        return userMapper.selectOne(queryWrapper).getNickname();
+    }
+
 }

@@ -19,4 +19,6 @@ public interface UserService extends IService<User>{
     User getUserById(Long uid);
 
     Page<User> getByNickname(String keyword, Integer pageNum, Integer pageSize, String sortField, Integer sortOrder);
+
+    String getNicknameById(Long uid);
 }
