@@ -221,7 +221,7 @@ public class UserController {
     }
 
     @GetMapping("/getNicknameById/{uid}")
-    public Result getNicknameById(@RequestHeader("Authorization") String token, @PathVariable Long uid) {
+    public Result getNicknameById(@PathVariable Long uid) {
         String nickname = userService.getNicknameById(uid);
         return Result.success(nickname);
     }
