@@ -104,9 +104,10 @@ public class UserController {
         //登录成功
         operations.set(LOGIN_COUNT + username, "0");
         Map<String, Object> claims = new HashMap<>();
-        claims.put("uid", loginUser.getUid());
+        claims.put("uid", String.valueOf(loginUser.getUid()));
         claims.put("username", loginUser.getUsername());
         claims.put("userType", loginUser.getUserType());
+        System.out.println(claims);
         String token = JwtUtils.generateJwt(claims, signKey, expire);
         return Result.success(token);
     }
@@ -121,7 +122,7 @@ public class UserController {
         Claims claims = JwtUtils.parseJWT(token, signKey);
 
         // 需要先转为String类型，再转为Long类型
-        String uidStr = String.valueOf(claims.get("uid"));
+        String uidStr = (String)claims.get("uid");
         Long uid = Long.parseLong(uidStr);
 
         User loginUser = userService.getUserById(uid);
