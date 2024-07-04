@@ -7,4 +7,4 @@ COPY ./target/user-1.0-SNAPSHOT.jar /user/user.jar
 # 暴露端口
 EXPOSE 8080
 # 入口，java项目的启动命令
-ENTRYPOINT java -jar -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xms1024m -Xmx1024m -Xmn256m -Xss256k -XX:SurvivorRatio=8 /user/user.jar --spring.profiles.active=pro
+ENTRYPOINT java -server -Xms1024m -Xmx1024m -jar /user/user.jar --spring.profiles.active=pro
